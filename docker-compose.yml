@@ -79,6 +79,8 @@ services:
     restart: unless-stopped
     ports:
       - 5678:5678
+    networks: 
+      - 'demo'
     volumes:
       - n8n_storage:/home/node/.n8n
       - ./n8n/backup:/backup
@@ -96,6 +98,7 @@ services:
     restart: unless-stopped
     ports:
       - 6333:6333
+      - 6334:6334
     volumes:
       - qdrant_storage:/qdrant/storage
 
@@ -125,3 +128,15 @@ services:
     <<: *init-ollama
     depends_on:
       - ollama-gpu
+
+  kernel_service:
+    image: kernelmemory/service:latest-arm64
+    container_name: kernel_service
+    ports:
+      - 9001:9001
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./appsettings.Development.json:/app/appsettings.Development.json
+    networks:
+      - demo

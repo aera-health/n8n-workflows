@@ -1,0 +1,384 @@
+{
+  "name": "Assistant triggers",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "health-plan",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -660,
+        0
+      ],
+      "id": "757c8ee5-bd1b-40ba-b79c-f01f635da542",
+      "name": "Webhook",
+      "webhookId": "33854dff-1df6-4c5b-a44c-3354b220201b"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        0
+      ],
+      "id": "a0478f08-1171-4d5d-9746-37154ddcc095",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "binaryPropertyName": "bloodTestResultsFile",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        -140
+      ],
+      "id": "457ce309-5853-436b-aced-3a229fec2fd2",
+      "name": "Extract from bloodTestResultsFile"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "binaryPropertyName": "questionnaireResultsFile",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        140
+      ],
+      "id": "a40230e7-51e3-4600-ae7d-4b7544d2d003",
+      "name": "Extract from questionnaireResultsFile"
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookData = $('Webhook').first().json.body;\nconst bloodResultsData = $('Extract from bloodTestResultsFile').first().json.data;\nconst questionnaireResultsData = $('Extract from questionnaireResultsFile').first().json.data;\n\nreturn [\n  {\n    pathwayUrl: webhookData.pathwayUrl,\n    inverventionName: webhookData.inverventionName,\n    searchType: webhookData.searchType,\n    bloodResultsData,\n    questionnaireResultsData\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        0
+      ],
+      "id": "e700efdf-dd79-4bf1-b0f0-7143c90e80d5",
+      "name": "Prepare input data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "FlTNy7Ck4cdbyZoi",
+          "mode": "list",
+          "cachedResultName": "Aera assistant"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        600,
+        0
+      ],
+      "id": "10712a96-c9c8-4ae3-ac25-0acf9438dfc9",
+      "name": "Generate Health Plan"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4f161109-11c2-42ac-9089-3ffe1b9b0825",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "formTitle": "Patient Health Plan Generation",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Blood lab test results",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".json",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Questionnaire results",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".json",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Pathway URL",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Intervention name"
+            },
+            {
+              "fieldLabel": "Search Type (Full is default)",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Full search"
+                  },
+                  {
+                    "option": "RAG search"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -660,
+        -400
+      ],
+      "id": "f5c7cd9a-6a44-42ae-9164-a25fdfab8e94",
+      "name": "On form submission",
+      "webhookId": "7830d51c-6d00-4ff9-aa2f-41dee3e7d3ae"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "binaryPropertyName": "=Blood_lab_test_results",
+        "destinationKey": "bloodLabTestResults",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -400
+      ],
+      "id": "abfe0e61-1273-4845-9565-f88255aa7ab0",
+      "name": "Extract Blood Test Results"
+    },
+    {
+      "parameters": {
+        "operation": "fromJson",
+        "binaryPropertyName": "=Questionnaire_results",
+        "destinationKey": "questionnaireResults",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        -400
+      ],
+      "id": "66478598-e067-4d55-a19b-11ee7d360f27",
+      "name": "Extract Questionnaire Results",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('On form submission').all().map((x, i) => {\n  const formData = x.json;\n  \n  return {\n    pathwayUrl: formData['Pathway URL'],\n    inverventionName: formData['Intervention name'],\n    searchType: formData['Search Type (Full is default)'],\n    bloodResultsData: $('Extract Blood Test Results').itemMatching(i).json.bloodLabTestResults,\n    questionnaireResultsData: $('Extract Questionnaire Results').itemMatching(i).json.questionnaireResults.questions\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        -400
+      ],
+      "id": "a81ed779-03d8-48ad-b299-b76980779738",
+      "name": "Standardise input data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "FlTNy7Ck4cdbyZoi",
+          "mode": "list",
+          "cachedResultName": "Aera assistant"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        580,
+        -400
+      ],
+      "id": "ab062d3d-2268-4756-bced-24a8d2853350",
+      "name": "Generate Health Plan1"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "respondWith": "redirect",
+        "redirectUrl": "={{ $json.markdownFileUrl }}"
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -400
+      ],
+      "id": "63912c40-5024-4139-989b-711b31f80515",
+      "name": "Form",
+      "webhookId": "b82c1453-9869-4257-bdb5-a0e88e7dd809"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract from questionnaireResultsFile",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract from bloodTestResultsFile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from bloodTestResultsFile": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from questionnaireResultsFile": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Prepare input data": {
+      "main": [
+        [
+          {
+            "node": "Generate Health Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Health Plan": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Prepare input data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract Questionnaire Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Blood Test Results": {
+      "main": [
+        [
+          {
+            "node": "Standardise input data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Questionnaire Results": {
+      "main": [
+        [
+          {
+            "node": "Extract Blood Test Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standardise input data": {
+      "main": [
+        [
+          {
+            "node": "Generate Health Plan1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Health Plan1": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c9803ec2-ed1a-47b5-9659-c260c6ecc6c5",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "VQp16H1U0aEjrzl2",
+  "tags": []
+}

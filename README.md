@@ -44,6 +44,10 @@ git clone https://github.com/n8n-io/self-hosted-ai-starter-kit.git
 cd self-hosted-ai-starter-kit
 ```
 
+### Credentials
+
+Set credentials to `appsettings.Development.json` for `kernel-service` service
+
 ### Running n8n using Docker Compose
 
 #### For Nvidia GPU users
