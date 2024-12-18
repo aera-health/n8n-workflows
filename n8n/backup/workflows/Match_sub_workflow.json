@@ -1,0 +1,458 @@
+{
+  "name": "Match sub-workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "48d7dd48-a0b2-469d-a342-ac3f6b232e78",
+      "name": "Execute Workflow Trigger"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        400
+      ],
+      "id": "383741e3-4cba-4ef5-8913-d2e1a4dc053e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "efHlwehLp2xTvVDY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"isRecommended\": {\n\t\t\t\"description\": \"Value is true if criteria are matched and there is no conflict.\",\n\t\t\t\"type\": \"boolean\"\n\t\t},\n\t\t\"recommendationReason\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"notRecommendationReason\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"option\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"dosage\": {\n\t\t\t\"type\": \"object\",\n\t\t\t\"properties\": {\n\t\t\t\t\"dosage\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t},\n\t\t\t\t\"recommendationReason\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"required\": [\n\t\t\t\t\"dosage\"\n\t\t\t]\n\t\t}\n\t},\n\t\"required\": [\n\t\t\"isRecommended\"\n\t]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1880,
+        420
+      ],
+      "id": "779da661-0ddc-4e4e-9581-1e84e12604bf",
+      "name": "TreatmentMatchResult Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Message history\n\nRole: system\n\nContent:\n{{ $('Prepare match prompt').item.json.system }}\n\n---\n\n{{ $('Prepare match prompt').item.json.user }}\n\n---\n\nRole:\nassistant\n\nContent: \n{{ $json.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Format your response in JSON format."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        1740,
+        160
+      ],
+      "id": "b17fd650-75f4-406c-af4f-ccb146fb106e",
+      "name": "To JSON format",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "jsCode": "function getMsg(msg) {\n  return `\n    Role:\n    ${msg.role}\n\n    Context:\n    ${msg.content}\n\n    ---\n  `.trim();\n}\n\nreturn $('Start point').all().map((x, i) => {\n  let result = 'INPUT (for context only, not to be used for faithfulness evaluation):\\n';\n\n  for (const item of x.json.history) {\n    result += `\\n${getMsg(item)}\\n`;\n  }\n\n  const response = $('Match item').itemMatching(i).json.text;\n  \n  result += `\\nOUTPUT:\\n\\n${response}`;\n  \n  return {\n    prompt: result\n  }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2180,
+        0
+      ],
+      "id": "f5e7d8b2-c587-4102-9a2f-88fbe466f395",
+      "name": "Prepare validation prompt"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"isValid\": {\n            \"description\": \"Your verdict\",\n\t\t\t\"type\": \"boolean\"\n\t\t},\n\t\t\"reasons\": {\n            \"description\": \"List your reasoning as bullet points\",\n\t\t\t\"type\": \"array\",\n\t\t\t\"items\": {\n\t\t\t\t\"type\": \"string\"\n\t\t\t}\n\t\t}\n\t},\n    \"required\": [ \"isValid\", \"reasons\" ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2940,
+        360
+      ],
+      "id": "92cc9a98-6247-41b5-9d36-338aa13cdab5",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        2800,
+        360
+      ],
+      "id": "7b911f8a-2904-43ff-adbc-b30b75692cc2",
+      "name": "gpt-4o JSON",
+      "credentials": {
+        "openAiApi": {
+          "id": "efHlwehLp2xTvVDY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        0
+      ],
+      "id": "4065c170-c568-4b2a-ab9b-6052a4262566",
+      "name": "Start point"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Start point').all().map((x, i) => {\n  const item = x.json;\n  const originItem = item.originItem;\n  const matchResult = $('To JSON format').itemMatching(i).json.output;\n  let matchedDosage = null;\n  \n  if (matchResult.dosage?.dosage) {\n    matchedDosage = originItem.dosages.find(d => d.dosage == matchResult.dosage.dosage);\n  }\n\n  const validationResults = [...item.validationResults];\n  const lastValidationResult = validationResults.length > 0 ? validationResults[validationResults.length - 1] : null;\n  const newValidationResult = $('Validate result').itemMatching(i).json.output;\n  validationResults.push({\n    retry: (lastValidationResult?.retry ?? -1) + 1,\n    ...newValidationResult\n  });\n\n  const history = [...item.history];\n  const matchResultText = $('Match item').itemMatching(i).json.text;\n\n  history.push(\n    {\n      role: 'assistant',\n      content: matchResultText\n    }\n  );\n  \n  const validationResult = $('Validate result').itemMatching(i).json.output;\n  \n  if (!validationResult.isValid) {\n    history.push({\n      role: 'user',\n      content: `\n        Previous generated result didn't pass validation.\n        Reasons:\n        ${validationResult.reasons.map(x => '- ' + x).join('\\n')}\n\n        Regenerate response.\n      `.trim()\n    });\n  }\n  \n  \n  \n  return {\n    ...item,\n    matchResult,\n    matchedDosage,\n    validationResults,\n    history\n  }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3360,
+        0
+      ],
+      "id": "832ee97f-a60b-4363-84a5-d5416fd86ee5",
+      "name": "Map to result model for loop"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Guidelines:\n1. The OUTPUT must not introduce new information beyond what's provided in the CONTEXT.\n2. The OUTPUT must not contradict any information given in the CONTEXT.\n3. Ignore the INPUT when evaluating faithfulness; it's provided for context only.\n4. Consider partial hallucinations where some information is correct but other parts are not.\n5. Pay close attention to the subject of statements. Ensure that attributes, actions, or dates are correctly associated with the right entities (e.g., a person vs. a TV show they star in).\n6. Be vigilant for subtle misattributions or conflations of information, even if the date or other details are correct.\n7. Check that the OUTPUT doesn't oversimplify or generalize information in a way that changes its meaning or accuracy.\n\nVerdict options:\n- \"true\": The OUTPUT is entirely faithful to the CONTEXT.\n- \"false\": The OUTPUT contains hallucinations or unfaithful information."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        2760,
+        120
+      ],
+      "id": "772e996e-2b05-4a4c-9304-db00fd6805d1",
+      "name": "Validate result",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "jsCode": "function getMsg(msg) {\n  return `\n    Role:\n    ${msg.role}\n    \n    Content: \n    ${msg.content}\n    ---\n  `.trim();\n}\n\nreturn $input.all().map(x => {\n  const item = x.json;\n  let userMsg = '';\n\n  for (const msg of item.history.slice(1)) {\n    userMsg += `\\n${getMsg(msg)}\\n`;\n  }\n  \n  return {\n    system: item.history[0].content,\n    user: userMsg\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "4a4626cf-2ea5-41aa-920a-244604d9af44",
+      "name": "Prepare match prompt"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2440,
+        0
+      ],
+      "id": "b34105af-5fde-4854-852a-3808d12198e5",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        800,
+        0
+      ],
+      "id": "536c4a69-7c58-4e04-b5f0-311e405f4e6e",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1480,
+        0
+      ],
+      "id": "13edacbb-50ed-4379-95a2-a07e47a2f7a7",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.user }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "={{ $json.system }}"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        1040,
+        160
+      ],
+      "id": "b50a5e39-f181-45ae-8d4c-8596529b5e63",
+      "name": "Match item",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "height": 780,
+        "width": 3760
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -180
+      ],
+      "id": "6ea2044a-5ef3-435d-89de-a4367f8a980b",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Match item",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TreatmentMatchResult Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "To JSON format",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To JSON format": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare validation prompt": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Validate result",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4o JSON": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Validate result",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "To JSON format",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start point": {
+      "main": [
+        [
+          {
+            "node": "Prepare match prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate result": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare match prompt": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Map to result model for loop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validate result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Match item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "Prepare validation prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "To JSON format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match item": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Start point",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "637d7fbe-6e03-4516-ad54-5696948e32d9",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "eFv4ckp62OkUBIuA",
+  "tags": []
+}

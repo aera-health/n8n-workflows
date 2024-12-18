@@ -1,0 +1,320 @@
+{
+  "name": "Assistant data indexing (Levitas TRT Pathway Breakdown)",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        60,
+        160
+      ],
+      "id": "548ca040-611e-4345-b093-d9067879d29d",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    kernelMemory: {\n      baseUrl: 'http://kernel_service:9001'\n    },\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        580,
+        160
+      ],
+      "id": "1e8047d8-464e-4cc4-9ead-c0a730834249",
+      "name": "Config"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    index: 'interventionsV1',\n  \"url\": \"https://fhir.aera.health/fhir/R4/PlanDefinition/2124af55-22b3-44e3-abeb-dfa750e3ea41\",\n  \"name\": \"Testosterone Therapy\",\n  \"treatments\": [\n    {\n      \"name\": \"DHEA\",\n      \"phase\": \"Diagnosis confirmed\",\n      \"url\": \"https://fhir.aera.health/fhir/R4/ActivityDefinition/e03cdbbf-b2e8-437a-a0e0-3bf1d302dffe\",\n      \"type\": \"Treatment\",\n      \"symptoms\": [\n        \"Obesity\",\n        \"Erectile disfunction\",\n        \"Adrenal insuficiency\"\n      ],\n      \"objective\": \"Bring DHEA sulphate levels to an optimal range (6umol/L)\",\n      \"inclusionTrigger\": \"\",\n      \"exclusionTrigger\": \"DHEA supplementation may be contraindicated in cases of hormone-sensitive cancers, high baseline DHEA, PCOS, pregnancy, mood disorders, liver or kidney disease, adrenal issues, diabetes, high blood pressure, or if taking certain medications.\",\n      \"options\": [\"Capsules\", \"Rapid Disolving Tablets\", \"Lozenges\", \"Sublingual drops\"],\n      \"frequency\": \"Daily at 7:00 AM\",\n      \"dossingInstructions\": \"Begin with 50% of optimal dose for first 2 weeks afterwards normal dose, -20% for RDTs, Lozenges & Sublingual Drops\",\n      \"review\": \"3 months\",\n      \"benefit\": \"\",\n      \"supportingActivities\": \"\",\n      \"description\": \"Dehydroepiandrosterone (DHEA) supplementation is used to increase DHEA and DHEA-sulfate levels in the body, potentially enhancing energy, strength, immune function, and decreasing stress. DHEA is administered orally.\\n\\nIndications:\\n• Adrenal insufficiency\\n• Depression\\n• Systemic lupus erythematosus (SLE)\\n• Aging skin\\n\\nContraindications:\\n• Cancer of the breast, ovaries, or prostate\\n• Severe liver disease\\n• Pregnancy\\n\\nPotential Side Effects:\\n• Oily skin and acne\\n• Hair loss\\n• Stomach upset\\n• High blood pressure\",\n      \"dosages\": [\n        {\n          \"dosage\": \"5mg\",\n          \"inclusionTrigger\": \"When DHEA measurements are around 8umol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"10mg\",\n          \"inclusionTrigger\": \"When DHEA measurements are around 7umol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"15mg\",\n          \"inclusionTrigger\": \"When DHEA measurements are around 6umol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"20mg\",\n          \"inclusionTrigger\": \"When DHEA measurements are around 5umol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"30mg\",\n          \"inclusionTrigger\": \"When DHEA measurements are around 4umol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"35mg\",\n          \"inclusionTrigger\": \"When DHEA measurements are around 3umol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"45mg\",\n          \"inclusionTrigger\": \"When DHEA measurements are around 2umol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"50mg\",\n          \"inclusionTrigger\": \"When DHEA measurements are around 1umol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        }\n      ]\n    },\n    {\n      \"name\": \"Testosterone\",\n      \"phase\": \"Diagnosis confirmed\",\n      \"url\": \"https://fhir.aera.health/fhir/R4/ActivityDefinition/399d2e94-ee03-4354-a0b0-9d0b15246b53\",\n      \"type\": \"Treatment\",\n      \"symptoms\": [\n        \"Reduced sex drive\",\n        \"Reduced erectile function\",\n        \"Loss of body hair\",\n        \"Less beard growth\",\n        \"Loss of lean muscle mass\",\n        \"Fatigue\",\n        \"Obesity\",\n        \"Symptoms of depression\"\n      ],\n      \"objective\": \"Bring Free Testosterone level to an optimal range (0,415-0,45 nmol/L)\",\n      \"inclusionTrigger\": \"\",\n      \"exclusionTrigger\": \"Testosterone supplementation should be strictly avoided in men with prostate or male breast cancer, severe untreated sleep apnea, advanced heart failure, very high hematocrit levels, or known allergies to testosterone formulations, as these conditions carry serious health risks when combined with hormone therapy. Caution and close monitoring are also essential for those with benign prostatic hyperplasia (BPH), elevated PSA levels, mild to moderate heart failure, blood clotting disorders, or uncontrolled hypertension, as testosterone can exacerbate symptoms or elevate risks associated with these conditions\",\n      \"options\": [\"Rapid Disolving Tablets\", \"Lozenges\",\"Sublingual drops\"],\n      \"frequency\": \"Daily at 9:00 AM\",\n      \"dossingInstructions\": \"Begin with 50% of optimal dose for first 2 weeks afterwards normal dose, -20% for RDTs, Lozenges & Sublingual Drops\",\n      \"review\": \"3 months\",\n      \"benefit\": \"\",\n      \"supportingActivities\": \"\",\n      \"description\": \"Testosterone therapy involves the administration of testosterone to treat conditions caused by low levels of testosterone such as hypogonadism. This treatment can be delivered via injections, transdermal patches, or gels, and aims to restore normal levels of testosterone, improving libido, energy, muscle mass, and bone density.\\n\\nIndications:\\n• Male hypogonadism\\n• Delayed puberty in boys\\n• Certain types of breast cancer in women\\n\\nContraindications:\\n• Prostate or breast cancer in men\\n• Severe liver disease\\n• Severe heart failure\\n\\nPotential Side Effects:\\n• Acne, skin irritation\\n• Increased risk of cardiovascular disease\\n• Liver abnormalities\\n• Mood Ideal level: 0,415-0,45 ng/dl\",\n      \"dosages\": [\n        {\n          \"dosage\": \"10mg\",\n          \"inclusionTrigger\": \"When Free Testosterone level is 0.45nmol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"25mg\",\n          \"inclusionTrigger\": \"When Free Testosterone level is 0.40nmol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"40mg\",\n          \"inclusionTrigger\": \"When Free Testosterone level is 0.35nmol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"50mg\",\n          \"inclusionTrigger\": \"When Free Testosterone level is 0.30nmol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"60mg\",\n          \"inclusionTrigger\": \"When Free Testosterone level is 0.25nmol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"75mg\",\n          \"inclusionTrigger\": \"When Free Testosterone level is 0.20nmol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"90mg\",\n          \"inclusionTrigger\": \"When Free Testosterone level is 0.15nmol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"100mg\",\n          \"inclusionTrigger\": \"When Free Testosterone level is 0.10nmol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"125mg\",\n          \"inclusionTrigger\": \"When Free Testosterone level is 0.05nmol/L or lower\",\n          \"exclusionTrigger\": \"\"\n        }\n      ]\n    },\n    {\n      \"name\": \"Nebido injection\",\n      \"phase\": \"Diagnosis confirmed\",\n      \"url\": \"\",\n      \"type\": \"Treatment\",\n      \"symptoms\": [\n        \"Reduced sex drive\",\n        \"Reduced erectile function\",\n        \"Loss of body hair\",\n        \"Less beard growtw\",\n        \"Loss of lean muscle mass\",\n        \"Fatigue\",\n        \"Obesity\",\n        \"Symptoms of depression\"\n      ],\n      \"objective\": \"Bring Free Testosterone level to an optimal range (0,415-0,45 nmol/L)\",\n      \"inclusionTrigger\": \"Personal preference: convenience; not need to remember to take daily\",\n      \"exclusionTrigger\": \"Testosterone supplementation should be strictly avoided in men with prostate or male breast cancer, severe untreated sleep apnea, advanced heart failure, very high hematocrit levels, or known allergies to testosterone formulations, as these conditions carry serious health risks when combined with hormone therapy. Caution and close monitoring are also essential for those with benign prostatic hyperplasia (BPH), elevated PSA levels, mild to moderate heart failure, blood clotting disorders, or uncontrolled hypertension, as testosterone can exacerbate symptoms or elevate risks associated with these conditions\",\n      \"options\": [\"Injection\"],\n      \"frequency\": \"First visit, 1 month later, months 3 & 5\",\n      \"dossingInstructions\": \"\",\n      \"review\": \"\",\n      \"benefit\": \"\",\n      \"supportingActivities\": \"\",\n      \"description\": \"\",\n      \"dosages\": [\n        {\n          \"dosage\": \"1000mg / 4ml\",\n          \"inclusionTrigger\": \"\",\n          \"exclusionTrigger\": \"\"\n        }\n      ]\n    },\n    {\n      \"name\": \"Pregnenolone\",\n      \"phase\": \"Diagnosis confirmed\",\n      \"url\": \"https://fhir.aera.health/fhir/R4/ActivityDefinition/9f7c5069-9e7b-4ef3-83d0-43caeab6af86\",\n      \"type\": \"Treatment\",\n      \"symptoms\": [\n        \"Sleep issues\",\n        \"Declining memory concentration and attention\", \n        \"Fatigue\", \n        \"Joint and muscle pain\", \n        \"Decreased sex drive\"\n      ],\n      \"objective\": \"Improve sleep and hormone production\",\n      \"inclusionTrigger\": \"Sleep issues, stressfull lifestyle, works a lot, competitive environment\",\n      \"exclusionTrigger\": \"Pregnenolone supplementation should be absolutely avoided in individuals with hormone-sensitive cancers (such as breast, ovarian, uterine, or prostate cancer), as well as in those with conditions like endometriosis or uterine fibroids, due to its potential to influence hormone levels. Pregnant or breastfeeding women should also avoid pregnenolone, as its safety in these populations has not been established. People with bipolar disorder or other severe mental health disorders should avoid pregnenolone, as it may exacerbate mood instability or trigger manic episodes. Those with liver or kidney disease are advised against its use, given the body’s reliance on these organs for metabolizing pregnenolone, which could pose a risk. Finally, pregnenolone should not be taken by individuals on hormone therapies, such as birth control or hormone replacement therapy, due to potential interactions that could disrupt hormone balance.\",\n      \"options\": [\"Capsules\", \"Rapid Disolving Tablets\", \"Lozenges\", \"Sublingual drops\"],\n      \"frequency\": \"Daily at night\",\n      \"dossingInstructions\": \"Begin with 50% of optimal dose for first 2 weeks then normal dose, -20% for RDTs, Lozenges & Sublingual Drops\",\n      \"review\": \"\",\n      \"benefit\": \"Improve sleep & overall hormonal production\",\n      \"supportingActivities\": \"Consume foods rich in cholesterol (eggs & lean meats)\",\n      \"description\": \"Pregnenolone is a steroid hormone involved in the synthesis of other steroids, including DHEA and progesterone. It's administered orally and is thought to improve cognitive performance and memory, relieve symptoms of menopause, and enhance mood.\\n\\nIndications:\\n• Cognitive decline\\n• Mood disorders\\n• Hormonal imbalances\\n\\nContraindications:\\n• Hormone-sensitive cancers\\n• Severe liver or kidney disease\\n• History of seizures\\n\\nPotential Side Effects:\\n• Overstimulation and insomnia\\n• Mood swings\\n• Headaches\\n• Irregular heart rhythms\",\n      \"dosages\": [\n        {\n          \"dosage\": \"30mg\",\n          \"inclusionTrigger\": \"\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"50mg\",\n          \"inclusionTrigger\": \"\",\n          \"exclusionTrigger\": \"\"\n        }\n      ]\n    },\n    {\n      \"name\": \"Vitamine D\",\n      \"phase\": \"Diagnosis confirmed\",\n      \"url\": \"https://fhir.aera.health/fhir/R4/ActivityDefinition/cd33e96f-38fb-487b-9303-56f7ca71686e\",\n      \"type\": \"Treatment\",\n      \"symptoms\": [\n        \"Persistent fatigue\",\n        \"low energy\", \n        \"muscle weakness\", \n        \"bone density loss\", \n        \"mood disturbances (such as depression and irritability)\",\n        \"compromised immune function\",\n        \"visceral fat accumulation\", \n        \"slow muscle recovery\", \n        \"reduced physical performance\"\n      ],\n      \"objective\": \"Bring Vitamine 25(OH)D to optimal range of 175 nmol/L\",\n      \"inclusionTrigger\": \"When Vitamine 25(OH)D is lower than 175 nmol/L in healthy men and 200 in men with chronic or autoinmune diseases\",\n      \"exclusionTrigger\": \"Absolute contraindications for vitamin D supplementation include hypercalcemia, sarcoidosis, tuberculosis, certain lymphomas, severe kidney disease or end-stage renal disease, hypervitaminosis D (vitamin D toxicity), and allergies to vitamin D or its additives.\",\n      \"options\": [],\n      \"frequency\": \"\",\n      \"dossingInstructions\": \"\",\n      \"review\": \"\",\n      \"benefit\": \"\",\n      \"supportingActivities\": \"\",\n      \"description\": \"Vitamin D is essential for bone health, immune function, and reduction of inflammation. It is typically administered orally to correct deficiencies, support bone health, and potentially prevent a range of chronic diseases.\\n\\nIndications:\\n• Vitamin D deficiency\\n• Osteoporosis\\n• Autoimmune disorders\\n• Prevention of certain cancers\\n\\nContraindications:\\n• Hypercalcemia\\n• Severe renal disease\\n\\nPotential Side Effects:\\n• Hypercalcemia if overdosed\\n• Nausea\\n• Fatigue\\n• Kidney stones\",\n      \"dosages\": [\n        {\n          \"dosage\": \"4.000UI\",\n          \"option\": \"Capsule\",\n          \"frequency\": \"Daily\",\n          \"inclusionTrigger\": \"\",\n          \"exclusionTrigger\": \"\"\n        },\n        {\n          \"dosage\": \"300.000UI\",\n          \"option\": \"Vial\",\n          \"frequency\": \"4 vials every 8 weeks\",\n          \"inclusionTrigger\": \"\",\n          \"exclusionTrigger\": \"\"\n        }\n      ]\n    },\n    {\n      \"name\": \"Anastrozole\",\n      \"phase\": \"Diagnosis confirmed\",\n      \"url\": \"https://fhir.aera.health/fhir/R4/ActivityDefinition/f444b1bd-938b-4e16-8739-0cc7a7e2acb1\",\n      \"type\": \"Treatment\",\n      \"symptoms\": [\n        \"Gynecomastia & Obesity\",\n        \"lack of confidence\"\n      ],\n      \"objective\": \"Help reduce weight and improve mood\",\n      \"inclusionTrigger\": \"Gynecomastia & Obesity, lack of confidence\",\n      \"exclusionTrigger\": \"\",\n      \"options\": [\"Capsule\"],\n      \"frequency\": \"Daily during 6 weeks, then every two days during 6 weeks\",\n      \"dossingInstructions\": \"\",\n      \"review\": \"\",\n      \"benefit\": \"\",\n      \"supportingActivities\": \"\",\n      \"description\": \"Anastrozole is an aromatase inhibitor used primarily to treat breast cancer in postmenopausal women. It works by lowering estrogen hormone levels to help shrink tumors and slow tumor growth. Anastrozole is taken orally.\\n\\nIndications:\\n• Breast cancer in postmenopausal women\\n• Adjuvant treatment of early breast cancer\\n• First-line treatment of locally advanced or metastatic breast cancer\\n\\nContraindications:\\n• Pre-existing heart conditions\\n• Osteoporosis\\n• Pre-menopausal women\\n\\nPotential Side Effects:\\n• Increased risk of fractures\\n• Joint pain\\n• Nausea\\n• Weakness\",\n      \"dosages\": [\n        {\n          \"dosage\": \"1mg\",\n          \"inclusionTrigger\": \"\",\n          \"exclusionTrigger\": \"\"\n        }\n      ]\n    }\n  ]\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        160
+      ],
+      "id": "e3cf9c29-f738-4e32-869f-90910af3937b",
+      "name": "Input"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.kernelMemory.baseUrl }}/upload",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "index",
+              "value": "={{ $json.index }}"
+            },
+            {
+              "name": "documentId",
+              "value": "={{ $json.documentId }}"
+            },
+            {
+              "name": "tags",
+              "value": "=pathwayUrl:{{ $json.pathwayUrl }}"
+            },
+            {
+              "name": "tags",
+              "value": "=name:{{ $json.name }}"
+            },
+            {
+              "name": "url",
+              "value": "=url:{{ $json.url }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file0",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2700,
+        160
+      ],
+      "id": "3e728c2a-66b0-455e-b8e6-c445cf6c483c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Input').first().json.treatments.map(item => {\n  return {\n    name: item.name,\n    benefit: item.benefit,\n    objective: item.objective,\n    exclusionTrigger: item.exclusionTrigger,\n    inclusionTrigger: item.inclusionTrigger,\n    dosages: item.dosages,\n    description: item.description\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1880,
+        160
+      ],
+      "id": "9581edb8-fe60-4e96-8722-54b99316941c",
+      "name": "Map index intervention model"
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "fileName": ""
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2140,
+        160
+      ],
+      "id": "488128d7-5529-46ec-9230-b7f6c561bd2e",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "jsCode": "function isValidChar(c) {\n    return /^[a-zA-Z0-9_.-]$/.test(c);\n}\n\nfunction replaceInvalidChars(value) {\n    if (value == null) {\n        return '';\n    }\n\n    return Array.from(value)\n        .map(c => (isValidChar(c) ? c : '_'))\n        .join('');\n}\n\nreturn $input.all().map((x, i) => {\n  const pathway = $('Input').first().json;\n  const intervention = pathway.treatments[i];\n  let documentId = replaceInvalidChars(`medication_${intervention.name}`.toLowerCase());\n  const index = $('Input').first().json.index;\n\n  return {\n    json: {\n      documentId,\n      jsonFileName: documentId + '.json',\n      pathwayUrl: pathway.url,\n      name: intervention.name,\n      url: intervention.url,\n      index \n    },\n    binary: x.binary\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        160
+      ],
+      "id": "f44d8d90-3537-45c7-b9a6-be47f64e83a0",
+      "name": "Metadata"
+    },
+    {
+      "parameters": {
+        "content": "## Levitas TRT Pathway Breakdown\n[Link](https://docs.google.com/spreadsheets/d/11sWacBb5frDQD8IqsruevzKpcoCD2Elt2E4XHkswvbg/edit?usp=sharing)",
+        "height": 420,
+        "width": 2860
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "aeee7e5c-5808-4452-b659-54644bf38550",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "name": "={{ $('Input').item.json.url + '.json' }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "13gNzGBlb92BhyBQ10pcx1w6D0PJqqVXq",
+          "mode": "list",
+          "cachedResultName": "health-plans",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/13gNzGBlb92BhyBQ10pcx1w6D0PJqqVXq"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1520,
+        160
+      ],
+      "id": "70e934d8-dafd-4778-b661-cae91b227da2",
+      "name": "Google Drive",
+      "credentials": {
+        "googleApi": {
+          "id": "XlFwzHsP62pz7O9I",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "options": {
+          "format": true
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1220,
+        160
+      ],
+      "id": "f7b701b5-708e-4de9-baf5-92a0bae81cfc",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Input').all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        160
+      ],
+      "id": "fdfa2298-3f0c-498d-ae7d-f202dd2ca442",
+      "name": "Pathway"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Pathway",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map index intervention model": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Metadata": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Map index intervention model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pathway": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "045de78b-6016-49e6-bdfc-df336fe6917b",
+  "meta": {
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "4tG1iEooBRmgRmQM",
+  "tags": []
+}
