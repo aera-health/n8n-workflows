@@ -135,7 +135,7 @@
     },
     {
       "parameters": {
-        "jsCode": "return $('Start point').all().map((x, i) => {\n  const item = x.json;\n  const originItem = item.originItem;\n  const matchResult = $('To JSON format').itemMatching(i).json.output;\n  let matchedDosage = null;\n  \n  if (matchResult.dosage?.dosage) {\n    matchedDosage = originItem.dosages.find(d => d.dosage == matchResult.dosage.dosage);\n  }\n\n  const validationResults = [...item.validationResults];\n  const lastValidationResult = validationResults.length > 0 ? validationResults[validationResults.length - 1] : null;\n  const newValidationResult = $('Validate result').itemMatching(i).json.output;\n  validationResults.push({\n    retry: (lastValidationResult?.retry ?? -1) + 1,\n    ...newValidationResult\n  });\n\n  const history = [...item.history];\n  const matchResultText = $('Match item').itemMatching(i).json.text;\n\n  history.push(\n    {\n      role: 'assistant',\n      content: matchResultText\n    }\n  );\n  \n  const validationResult = $('Validate result').itemMatching(i).json.output;\n  \n  if (!validationResult.isValid) {\n    history.push({\n      role: 'user',\n      content: `\n        Previous generated result didn't pass validation.\n        Reasons:\n        ${validationResult.reasons.map(x => '- ' + x).join('\\n')}\n\n        Regenerate response.\n      `.trim()\n    });\n  }\n  \n  \n  \n  return {\n    ...item,\n    matchResult,\n    matchedDosage,\n    validationResults,\n    history\n  }\n});"
+        "jsCode": "return $('Start point').all().map((x, i) => {\n  const item = x.json;\n  const originItem = item.originItem;\n  const matchResult = $('Loop Over To JSON format').itemMatching(i).json.output;\n  let matchedDosage = null;\n  \n  if (matchResult.dosage?.dosage) {\n    matchedDosage = originItem.dosages.find(d => d.dosage == matchResult.dosage.dosage);\n  }\n\n  const validationResults = [...item.validationResults];\n  const lastValidationResult = validationResults.length > 0 ? validationResults[validationResults.length - 1] : null;\n  const newValidationResult = $('Loop Over Validate result').itemMatching(i).json.output;\n  validationResults.push({\n    retry: (lastValidationResult?.retry ?? -1) + 1,\n    ...newValidationResult\n  });\n\n  const history = [...item.history];\n  const matchResultText = $('Loop Over Match item').itemMatching(i).json.text;\n\n  history.push(\n    {\n      role: 'assistant',\n      content: matchResultText\n    }\n  );\n  \n  const validationResult = $('Loop Over Validate result').itemMatching(i).json.output;\n  \n  if (!validationResult.isValid) {\n    history.push({\n      role: 'user',\n      content: `\n        Previous generated result didn't pass validation.\n        Reasons:\n        ${validationResult.reasons.map(x => '- ' + x).join('\\n')}\n\n        Regenerate response.\n      `.trim()\n    });\n  }\n  \n  \n  \n  return {\n    ...item,\n    matchResult,\n    matchedDosage,\n    validationResults,\n    history\n  }\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -186,45 +186,6 @@
     },
     {
       "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        2440,
-        0
-      ],
-      "id": "b34105af-5fde-4854-852a-3808d12198e5",
-      "name": "Loop Over Items1"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        800,
-        0
-      ],
-      "id": "536c4a69-7c58-4e04-b5f0-311e405f4e6e",
-      "name": "Loop Over Items2"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        1480,
-        0
-      ],
-      "id": "13edacbb-50ed-4379-95a2-a07e47a2f7a7",
-      "name": "Loop Over Items3"
-    },
-    {
-      "parameters": {
         "promptType": "define",
         "text": "={{ $json.user }}",
         "messages": {
@@ -260,6 +221,45 @@
       ],
       "id": "6ea2044a-5ef3-435d-89de-a4367f8a980b",
       "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1480,
+        0
+      ],
+      "id": "13edacbb-50ed-4379-95a2-a07e47a2f7a7",
+      "name": "Loop Over To JSON format"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2440,
+        0
+      ],
+      "id": "b34105af-5fde-4854-852a-3808d12198e5",
+      "name": "Loop Over Validate result"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        800,
+        0
+      ],
+      "id": "536c4a69-7c58-4e04-b5f0-311e405f4e6e",
+      "name": "Loop Over Match item"
     }
   ],
   "pinData": {},
@@ -290,7 +290,7 @@
       "main": [
         [
           {
-            "node": "Loop Over Items3",
+            "node": "Loop Over To JSON format",
             "type": "main",
             "index": 0
           }
@@ -301,7 +301,7 @@
       "main": [
         [
           {
-            "node": "Loop Over Items1",
+            "node": "Loop Over Validate result",
             "type": "main",
             "index": 0
           }
@@ -350,7 +350,7 @@
       "main": [
         [
           {
-            "node": "Loop Over Items1",
+            "node": "Loop Over Validate result",
             "type": "main",
             "index": 0
           }
@@ -361,50 +361,36 @@
       "main": [
         [
           {
-            "node": "Loop Over Items2",
+            "node": "Loop Over Match item",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Loop Over Items1": {
+    "Match item": {
       "main": [
         [
           {
-            "node": "Map to result model for loop",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Validate result",
+            "node": "Loop Over Match item",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Loop Over Items2": {
+    "Execute Workflow Trigger": {
       "main": [
         [
           {
-            "node": "Loop Over Items3",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Match item",
+            "node": "Start point",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Loop Over Items3": {
+    "Loop Over To JSON format": {
       "main": [
         [
           {
@@ -422,22 +408,36 @@
         ]
       ]
     },
-    "Match item": {
+    "Loop Over Validate result": {
       "main": [
         [
           {
-            "node": "Loop Over Items2",
+            "node": "Map to result model for loop",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Validate result",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Execute Workflow Trigger": {
+    "Loop Over Match item": {
       "main": [
         [
           {
-            "node": "Start point",
+            "node": "Loop Over To JSON format",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Match item",
             "type": "main",
             "index": 0
           }
@@ -449,7 +449,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "637d7fbe-6e03-4516-ad54-5696948e32d9",
+  "versionId": "d904519a-6dc0-4285-b81a-6dd6c288b3ca",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

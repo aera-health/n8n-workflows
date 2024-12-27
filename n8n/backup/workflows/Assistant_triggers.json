@@ -45,7 +45,8 @@
         -140
       ],
       "id": "457ce309-5853-436b-aced-3a229fec2fd2",
-      "name": "Extract from bloodTestResultsFile"
+      "name": "Extract from bloodTestResultsFile",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -60,16 +61,17 @@
         140
       ],
       "id": "a40230e7-51e3-4600-ae7d-4b7544d2d003",
-      "name": "Extract from questionnaireResultsFile"
+      "name": "Extract from questionnaireResultsFile",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
-        "jsCode": "const webhookData = $('Webhook').first().json.body;\nconst bloodResultsData = $('Extract from bloodTestResultsFile').first().json.data;\nconst questionnaireResultsData = $('Extract from questionnaireResultsFile').first().json.data;\n\nreturn [\n  {\n    pathwayUrl: webhookData.pathwayUrl,\n    inverventionName: webhookData.inverventionName,\n    searchType: webhookData.searchType,\n    bloodResultsData,\n    questionnaireResultsData\n  }\n]"
+        "jsCode": "const webhookData = $('Webhook').first().json.body;\nconst bloodResultsData = $('Extract from bloodTestResultsFile').first().json.data;\nconst questionnaireResultsData = $('Extract from questionnaireResultsFile').first()?.json?.data;\nconst patientProfile = $('Extract from patientProfileFile').first().json.data;\n\nreturn [\n  {\n    pathwayUrl: webhookData.pathwayUrl,\n    inverventionName: webhookData.inverventionName,\n    searchType: webhookData.searchType,\n    bloodResultsData,\n    questionnaireResultsData,\n    patientProfile\n  }\n]"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        200,
+        280,
         0
       ],
       "id": "e700efdf-dd79-4bf1-b0f0-7143c90e80d5",
@@ -95,7 +97,9 @@
       "name": "Generate Health Plan"
     },
     {
-      "parameters": {},
+      "parameters": {
+        "numberInputs": 3
+      },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3,
       "position": [
@@ -240,6 +244,22 @@
       "id": "63912c40-5024-4139-989b-711b31f80515",
       "name": "Form",
       "webhookId": "b82c1453-9869-4257-bdb5-a0e88e7dd809"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "patientProfile",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        400
+      ],
+      "id": "fbd149fb-16af-46a2-a623-a0ec7078f016",
+      "name": "Extract from patientProfileFile",
+      "alwaysOutputData": true
     }
   ],
   "pinData": {},
@@ -254,6 +274,11 @@
           },
           {
             "node": "Extract from bloodTestResultsFile",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract from patientProfileFile",
             "type": "main",
             "index": 0
           }
@@ -369,13 +394,24 @@
           }
         ]
       ]
+    },
+    "Extract from patientProfileFile": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "c9803ec2-ed1a-47b5-9659-c260c6ecc6c5",
+  "versionId": "a34c1982-9d50-430e-b69e-8a98fba13011",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },
