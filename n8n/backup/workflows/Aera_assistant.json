@@ -684,7 +684,7 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
       "position": [
-        3220,
+        3320,
         960
       ],
       "id": "ea0941ac-2eb9-4b42-b001-2333d3b7452f",
@@ -695,44 +695,6 @@
           "name": "OpenAi account"
         }
       }
-    },
-    {
-      "parameters": {
-        "jsonSchemaExample": "{\n\t\"queries\": [\n      {\n        \"query\": \"Query text\",\n        \"reason\": \"Reason for generated query\"\n      }\n    ]\n}"
-      },
-      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
-      "typeVersion": 1.2,
-      "position": [
-        3380,
-        960
-      ],
-      "id": "7e156e1c-1749-4928-8d8c-6e9b9307def0",
-      "name": "Structured Output Parser1"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=# Message History\n\n**System:**\n{{ $('Prepare prompt for RAG queries generation').item.json.history[0].content }}\n\n**User:**\n{{ $('Prepare prompt for RAG queries generation').item.json.history[1].content }}\n\n**Assistant:**\n{{ $json.text }}",
-        "hasOutputParser": true,
-        "messages": {
-          "messageValues": [
-            {
-              "message": "Format your response in JSON format."
-            }
-          ]
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.5,
-      "position": [
-        3180,
-        740
-      ],
-      "id": "dc462edc-25c1-421c-ab5c-9a1c92144778",
-      "name": "Format as JSON",
-      "retryOnFail": true,
-      "waitBetweenTries": 5000,
-      "maxTries": 5
     },
     {
       "parameters": {
@@ -1090,6 +1052,25 @@
       ],
       "id": "e1f31da9-1cd1-4f75-9aa0-5e62efe2e87a",
       "name": "Started at"
+    },
+    {
+      "parameters": {
+        "text": "=# Message History\n\n**System:**\n{{ $('Prepare prompt for RAG queries generation').item.json.history[0].content }}\n\n**User:**\n{{ $('Prepare prompt for RAG queries generation').item.json.history[1].content }}\n\n**Assistant:**\n{{ $json.text }}",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n\t\"queries\": [\n      {\n        \"query\": \"Query text\",\n        \"reason\": \"Reason for generated query\"\n      }\n    ]\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        3220,
+        740
+      ],
+      "id": "0260d9a1-b9ae-45eb-a657-a2fb353bbb18",
+      "name": "Format as JSON",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     }
   ],
   "pinData": {
@@ -1584,28 +1565,6 @@
         ]
       ]
     },
-    "Structured Output Parser1": {
-      "ai_outputParser": [
-        [
-          {
-            "node": "Format as JSON",
-            "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Format as JSON": {
-      "main": [
-        [
-          {
-            "node": "Split Out",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Split Out": {
       "main": [
         [
@@ -1835,13 +1794,24 @@
           }
         ]
       ]
+    },
+    "Format as JSON": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "6434ca4c-df9e-45a7-a9e3-be777e413868",
+  "versionId": "208668f8-84d1-44ff-a0b3-36faedd1f93d",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },

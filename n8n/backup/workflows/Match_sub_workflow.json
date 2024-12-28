@@ -34,45 +34,6 @@
     },
     {
       "parameters": {
-        "schemaType": "manual",
-        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"isRecommended\": {\n\t\t\t\"description\": \"Value is true if criteria are matched and there is no conflict.\",\n\t\t\t\"type\": \"boolean\"\n\t\t},\n\t\t\"recommendationReason\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"notRecommendationReason\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"option\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"dosage\": {\n\t\t\t\"type\": \"object\",\n\t\t\t\"properties\": {\n\t\t\t\t\"dosage\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t},\n\t\t\t\t\"recommendationReason\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"required\": [\n\t\t\t\t\"dosage\"\n\t\t\t]\n\t\t}\n\t},\n\t\"required\": [\n\t\t\"isRecommended\"\n\t]\n}"
-      },
-      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
-      "typeVersion": 1.2,
-      "position": [
-        1880,
-        420
-      ],
-      "id": "779da661-0ddc-4e4e-9581-1e84e12604bf",
-      "name": "TreatmentMatchResult Parser"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=# Message history\n\nRole: system\n\nContent:\n{{ $('Prepare match prompt').item.json.system }}\n\n---\n\n{{ $('Prepare match prompt').item.json.user }}\n\n---\n\nRole:\nassistant\n\nContent: \n{{ $json.text }}",
-        "hasOutputParser": true,
-        "messages": {
-          "messageValues": [
-            {
-              "message": "=Format your response in JSON format."
-            }
-          ]
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.4,
-      "position": [
-        1740,
-        160
-      ],
-      "id": "b17fd650-75f4-406c-af4f-ccb146fb106e",
-      "name": "To JSON format",
-      "retryOnFail": true,
-      "waitBetweenTries": 5000,
-      "maxTries": 5
-    },
-    {
-      "parameters": {
         "jsCode": "function getMsg(msg) {\n  return `\n    Role:\n    ${msg.role}\n\n    Context:\n    ${msg.content}\n\n    ---\n  `.trim();\n}\n\nreturn $('Start point').all().map((x, i) => {\n  let result = 'INPUT (for context only, not to be used for faithfulness evaluation):\\n';\n\n  for (const item of x.json.history) {\n    result += `\\n${getMsg(item)}\\n`;\n  }\n\n  const response = $('Match item').itemMatching(i).json.text;\n  \n  result += `\\nOUTPUT:\\n\\n${response}`;\n  \n  return {\n    prompt: result\n  }\n});"
       },
       "type": "n8n-nodes-base.code",
@@ -83,42 +44,6 @@
       ],
       "id": "f5e7d8b2-c587-4102-9a2f-88fbe466f395",
       "name": "Prepare validation prompt"
-    },
-    {
-      "parameters": {
-        "schemaType": "manual",
-        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"isValid\": {\n            \"description\": \"Your verdict\",\n\t\t\t\"type\": \"boolean\"\n\t\t},\n\t\t\"reasons\": {\n            \"description\": \"List your reasoning as bullet points\",\n\t\t\t\"type\": \"array\",\n\t\t\t\"items\": {\n\t\t\t\t\"type\": \"string\"\n\t\t\t}\n\t\t}\n\t},\n    \"required\": [ \"isValid\", \"reasons\" ]\n}"
-      },
-      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
-      "typeVersion": 1.2,
-      "position": [
-        2940,
-        360
-      ],
-      "id": "92cc9a98-6247-41b5-9d36-338aa13cdab5",
-      "name": "Structured Output Parser"
-    },
-    {
-      "parameters": {
-        "model": "gpt-4o",
-        "options": {
-          "responseFormat": "json_object"
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
-      "typeVersion": 1,
-      "position": [
-        2800,
-        360
-      ],
-      "id": "7b911f8a-2904-43ff-adbc-b30b75692cc2",
-      "name": "gpt-4o JSON",
-      "credentials": {
-        "openAiApi": {
-          "id": "efHlwehLp2xTvVDY",
-          "name": "OpenAi account"
-        }
-      }
     },
     {
       "parameters": {
@@ -140,36 +65,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3360,
-        0
+        3220,
+        -20
       ],
       "id": "832ee97f-a60b-4363-84a5-d5416fd86ee5",
       "name": "Map to result model for loop"
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "={{ $json.prompt }}",
-        "hasOutputParser": true,
-        "messages": {
-          "messageValues": [
-            {
-              "message": "=Guidelines:\n1. The OUTPUT must not introduce new information beyond what's provided in the CONTEXT.\n2. The OUTPUT must not contradict any information given in the CONTEXT.\n3. Ignore the INPUT when evaluating faithfulness; it's provided for context only.\n4. Consider partial hallucinations where some information is correct but other parts are not.\n5. Pay close attention to the subject of statements. Ensure that attributes, actions, or dates are correctly associated with the right entities (e.g., a person vs. a TV show they star in).\n6. Be vigilant for subtle misattributions or conflations of information, even if the date or other details are correct.\n7. Check that the OUTPUT doesn't oversimplify or generalize information in a way that changes its meaning or accuracy.\n\nVerdict options:\n- \"true\": The OUTPUT is entirely faithful to the CONTEXT.\n- \"false\": The OUTPUT contains hallucinations or unfaithful information."
-            }
-          ]
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.chainLlm",
-      "typeVersion": 1.4,
-      "position": [
-        2760,
-        120
-      ],
-      "id": "772e996e-2b05-4a4c-9304-db00fd6805d1",
-      "name": "Validate result",
-      "retryOnFail": true,
-      "waitBetweenTries": 5000,
-      "maxTries": 5
     },
     {
       "parameters": {
@@ -211,7 +111,7 @@
     {
       "parameters": {
         "height": 780,
-        "width": 3760
+        "width": 3580
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -242,7 +142,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        2440,
+        2460,
         0
       ],
       "id": "b34105af-5fde-4854-852a-3808d12198e5",
@@ -260,6 +160,108 @@
       ],
       "id": "536c4a69-7c58-4e04-b5f0-311e405f4e6e",
       "name": "Loop Over Match item"
+    },
+    {
+      "parameters": {
+        "text": "=# Message history\n\nRole: system\n\nContent:\n{{ $('Prepare match prompt').item.json.system }}\n\n---\n\n{{ $('Prepare match prompt').item.json.user }}\n\n---\n\nRole:\nassistant\n\nContent: \n{{ $json.text }}",
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"isRecommended\": {\n\t\t\t\"description\": \"Value is true if criteria are matched and there is no conflict.\",\n\t\t\t\"type\": \"boolean\"\n\t\t},\n\t\t\"recommendationReason\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"notRecommendationReason\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"option\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"dosage\": {\n\t\t\t\"type\": \"object\",\n\t\t\t\"properties\": {\n\t\t\t\t\"dosage\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t},\n\t\t\t\t\"recommendationReason\": {\n\t\t\t\t\t\"type\": \"string\"\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"required\": [\n\t\t\t\t\"dosage\"\n\t\t\t]\n\t\t}\n\t},\n\t\"required\": [\n\t\t\"isRecommended\"\n\t]\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        1720,
+        220
+      ],
+      "id": "63f8a829-0f60-4d88-b136-87dc4e850da2",
+      "name": "To JSON format",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        460
+      ],
+      "id": "9b391fc8-e83d-4283-b686-6d63a73047b5",
+      "name": "gpt-4o JSON1",
+      "credentials": {
+        "openAiApi": {
+          "id": "efHlwehLp2xTvVDY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"isValid\": {\n            \"description\": \"Your verdict\",\n\t\t\t\"type\": \"boolean\"\n\t\t},\n\t\t\"reasons\": {\n            \"description\": \"List your reasoning as bullet points\",\n\t\t\t\"type\": \"array\",\n\t\t\t\"items\": {\n\t\t\t\t\"type\": \"string\"\n\t\t\t}\n\t\t}\n\t},\n    \"required\": [ \"isValid\", \"reasons\" ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2900,
+        400
+      ],
+      "id": "d630a1a5-024c-4cb1-8e7e-36e81486d69f",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        2760,
+        400
+      ],
+      "id": "9ffa639b-ae07-446d-84ab-63e2508373e8",
+      "name": "gpt-4o JSON2",
+      "credentials": {
+        "openAiApi": {
+          "id": "efHlwehLp2xTvVDY",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Guidelines:\n1. The OUTPUT must not introduce new information beyond what's provided in the CONTEXT.\n2. The OUTPUT must not contradict any information given in the CONTEXT.\n3. Ignore the INPUT when evaluating faithfulness; it's provided for context only.\n4. Consider partial hallucinations where some information is correct but other parts are not.\n5. Pay close attention to the subject of statements. Ensure that attributes, actions, or dates are correctly associated with the right entities (e.g., a person vs. a TV show they star in).\n6. Be vigilant for subtle misattributions or conflations of information, even if the date or other details are correct.\n7. Check that the OUTPUT doesn't oversimplify or generalize information in a way that changes its meaning or accuracy.\n\nVerdict options:\n- \"true\": The OUTPUT is entirely faithful to the CONTEXT.\n- \"false\": The OUTPUT contains hallucinations or unfaithful information."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        2720,
+        160
+      ],
+      "id": "f1beb73d-2ff5-4d17-b8d2-55083c5f3d34",
+      "name": "Validate result",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5
     }
   ],
   "pinData": {},
@@ -270,28 +272,6 @@
           {
             "node": "Match item",
             "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "TreatmentMatchResult Parser": {
-      "ai_outputParser": [
-        [
-          {
-            "node": "To JSON format",
-            "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "To JSON format": {
-      "main": [
-        [
-          {
-            "node": "Loop Over To JSON format",
-            "type": "main",
             "index": 0
           }
         ]
@@ -308,49 +288,11 @@
         ]
       ]
     },
-    "Structured Output Parser": {
-      "ai_outputParser": [
-        [
-          {
-            "node": "Validate result",
-            "type": "ai_outputParser",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "gpt-4o JSON": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "Validate result",
-            "type": "ai_languageModel",
-            "index": 0
-          },
-          {
-            "node": "To JSON format",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Start point": {
       "main": [
         [
           {
             "node": "Prepare match prompt",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Validate result": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Validate result",
             "type": "main",
             "index": 0
           }
@@ -443,13 +385,68 @@
           }
         ]
       ]
+    },
+    "To JSON format": {
+      "main": [
+        [
+          {
+            "node": "Loop Over To JSON format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4o JSON1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "To JSON format",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Validate result",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-4o JSON2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Validate result",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate result": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Validate result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "d904519a-6dc0-4285-b81a-6dd6c288b3ca",
+  "versionId": "a1891843-8afd-43f6-b9ff-7025b7a16965",
   "meta": {
     "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
   },
